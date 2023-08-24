@@ -1,0 +1,63 @@
+Here is my solidity ERC721 token.
+
+```
+// contracts/BasicNft.sol
+// SPDX-License-Identifier: SEE LICENSE IN LICENSE
+pragma solidity ^0.8.18;
+
+import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+
+contract BasicNft is ERC721 {
+    uint256 public s_tokenCounter;
+    mapping(uint256 => string) public s_tokenIdToURIs;
+
+    constructor() ERC721("Dogie", "DOG") {
+        s_tokenCounter = 0;
+    }
+
+    function minNft(string memory _tokenUri) public {
+        s_tokenIdToURIs[s_tokenCounter] = _tokenUri;
+        _safeMint(msg.sender, s_tokenCounter);
+        s_tokenCounter++;
+    }
+
+    function tokenURI(
+        uint256 tokenId
+    ) public view override returns (string memory) {
+        return s_tokenIdToURIs[tokenId];
+    }
+}
+```
+
+And here our my first couple of tests written in solidity.
+
+```
+// SPDX-License-Identifier: SEE LICENSE IN LICENSE
+pragma solidity ^0.8.18;
+
+import {DeployBasicNft} from "../script/DeployBasicNft.s.sol";
+import {BasicNft} from "../src/BasicNft.sol";
+import {Test, console} from "forge-std/Test.sol";
+
+contract TestBasicNft is Test {
+    BasicNft public basicNft;
+    DeployBasicNft public deployer;
+
+    function setUp() public {
+        deployer = new DeployBasicNft();
+        basicNft = deployer.run();
+    }
+
+    function testTokenCounter() public {
+        uint256 tokenCounter = basicNft.s_tokenCounter();
+        assertTrue(tokenCounter == 0);
+    }
+}
+
+```
+
+Can you write the rest of the tests? Please include tests for:
+
+- mint
+- transfers
+- anything else that might be important
